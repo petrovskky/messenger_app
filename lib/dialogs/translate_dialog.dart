@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger/data/data_sources/interfaces/i_preference_data_source.dart';
+import 'package:messenger/domain/entities/language.dart';
+import 'package:messenger/presentation/di/injector.dart';
+import 'package:messenger/data/utils/translator.dart';
 
 class TranslateDialog extends StatefulWidget {
   final String originText;
-  final Language? lang;
-  final Future<String> Function(String text) onTranslate;
 
   const TranslateDialog({
     super.key,
     required this.originText,
-    required this.lang,
-    required this.onTranslate,
   });
 
   @override
@@ -23,7 +23,7 @@ class TranslateDialogState extends State<TranslateDialog> {
 
   @override
   void initState() {
-    _selectedLanguage = widget.lang ?? Language.English;
+    _selectedLanguage = getIt.get<IPreferenceDataSource>().messageLanguage;
     super.initState();
   }
 
@@ -39,7 +39,7 @@ class TranslateDialogState extends State<TranslateDialog> {
         alignment: Alignment.topRight,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,9 +47,13 @@ class TranslateDialogState extends State<TranslateDialog> {
                 DropdownButton<Language>(
                   value: _selectedLanguage,
                   onChanged: (Language? newValue) async {
-                    _translatedText = await widget.onTranslate(widget.originText);
+                    _selectedLanguage = newValue ?? _selectedLanguage;
+                    _translatedText = await Translator.translate(
+                      widget.originText,
+                      _selectedLanguage,
+                    );
                     setState(() {
-                      _selectedLanguage = newValue ?? _selectedLanguage;
+                      getIt.get<IPreferenceDataSource>().messageLanguage = _selectedLanguage;
                     });
                   },
                   items: Language.values.map((Language language) {

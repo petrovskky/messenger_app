@@ -1,17 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:messenger/data/repositories/auth_repository.dart';
+import 'package:messenger/domain/data_interfaces/i_auth_repository.dart';
 import 'package:messenger_app/auth/cubit/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final AuthRepository _authRepository;
+  final IAuthRepository _authRepository;
 
-  AuthCubit({required AuthRepository authRepository})
+  AuthCubit({required IAuthRepository authRepository})
       : _authRepository = authRepository,
         super(InitialState());
 
   Future<void> checkAuth() async {
     await Future.delayed(const Duration(milliseconds: 3000));
-    if (_authRepository.firebaseAuth.currentUser != null) {
+    if (_authRepository.isAuthorized) {
       emit(AuthenticatedState());
     } else {
       emit(NotAuthenticatedState());
@@ -24,7 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     try {
       final result = await _authRepository.signIn(email: email, password: password);
-      if (result != null) {
+      if (result) {
         emit(AuthenticatedState());
         return true;
       }

@@ -4,9 +4,6 @@ import 'package:messenger/domain/entities/user.dart';
 import 'package:messenger_app/dialogs/translate_dialog.dart';
 import 'package:messenger_app/profile/user_page.dart';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 class ChatPage extends StatefulWidget {
   final User user;
 
@@ -20,61 +17,61 @@ class ChatPageState extends State<ChatPage> {
   final messages = [
     Message(
       dateTime: DateTime.now().subtract(Duration(hours: 2)),
-      text: 'Какие планы на выходные?',
+      text: 'What are your plans for the weekend?',
       userImage:
           'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
     ),
     Message(
       dateTime: DateTime.now().subtract(Duration(hours: 1)),
-      text: 'Я думаю пойти в поход.',
+      text: 'I am thinking of going hiking.',
       userImage:
           'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
     ),
     Message(
       dateTime: DateTime.now(),
-      text: 'Звучит замечательно! Может, присоединюсь к тебе.',
+      text: 'Sounds great! Maybe I will join you.',
       userImage:
           'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 10)),
-      text: 'Это было бы здорово!',
+      text: 'That would be awesome!',
       userImage:
           'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 20)),
-      text: 'У тебя есть другие планы?',
+      text: 'Do you have any other plans?',
       userImage:
           'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 30)),
-      text: 'Я планирую навестить семью',
+      text: 'I plan to visit my family',
       userImage:
           'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 40)),
-      text: 'Звучит круто 👍',
+      text: 'Sounds cool 👍',
       userImage:
           'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 50)),
-      text: 'Спасибо! Хороших выходных!',
+      text: 'Thank you! Have a great weekend!',
       userImage:
           'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 55)),
-      text: 'И тебе 😀',
+      text: 'And you 😀',
       userImage:
           'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
     ),
     Message(
       dateTime: DateTime.now().add(Duration(minutes: 60)),
-      text: 'Увидимся в понедельник 👋',
+      text: 'See you on Monday 👋',
       userImage:
           'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
     ),
@@ -126,7 +123,7 @@ class ChatPageState extends State<ChatPage> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return TranslateDialog(originText: message.text, lang: ,);
+                        return TranslateDialog(originText: message.text);
                       },
                     );
                   },
@@ -135,8 +132,8 @@ class ChatPageState extends State<ChatPage> {
                         ? Alignment.centerRight
                         : Alignment.centerLeft,
                     child: Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                       decoration: BoxDecoration(
                         color: isUserMessage
                             ? const Color(0xFF008a8b)
@@ -196,36 +193,6 @@ class ChatPageState extends State<ChatPage> {
         ],
       ),
     );
-  }
-
-  Future<String> translate(String message, String target) async {
-    final url = Uri.parse('https://translate-plus.p.rapidapi.com/translate');
-    final body = jsonEncode({
-      'text': message,
-      'source': 'auto',
-      'target': target,
-    });
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'x-rapidapi-ua': 'RapidAPI-Playground',
-        'x-rapidapi-key': '45187f901amsh6f0709b3adc1a84p14da17jsnd75099fdda7f',
-        'x-rapidapi-host': 'translate-plus.p.rapidapi.com',
-        'specificMethodHeaders': '[object Object]'
-      },
-      body: body,
-    );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      return jsonResponse;
-    } else {
-      print('Request failed with status code: ${response.statusCode}');
-    }
-    return message;
   }
 }
 

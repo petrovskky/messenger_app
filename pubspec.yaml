@@ -18,6 +18,7 @@ dependencies:
   firebase_core: ^2.32.0
   cloud_firestore: ^4.17.5
   image_picker: ^1.1.2
+  shared_preferences: ^2.2.3
   messenger:
     path: ../messenger/messenger
 
