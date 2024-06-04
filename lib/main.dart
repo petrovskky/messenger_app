@@ -1,7 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:messenger/auth/sign_in_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:messenger/data/repositories/auth_repository.dart';
+import 'package:messenger_app/auth/cubit/auth_cubit.dart';
+import 'package:messenger_app/auth/cubit/auth_state.dart';
+import 'package:messenger_app/auth/sign_in_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:messenger_app/dialogs/dialogs_page.dart';
+import 'package:messenger_app/lang/locale_keys.g.dart';
+import 'package:messenger_app/main_tab.dart';
 import 'firebase_options.dart';
 
 import 'lang/codegen_loader.g.dart';
@@ -25,19 +34,42 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
-      locale: context.locale,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return BlocProvider<AuthCubit>(
+      create: (context) => AuthCubit(
+        authRepository: AuthRepository(
+          firebaseAuth: FirebaseAuth.instance,
+          firebaseFirestore: FirebaseFirestore.instance,
+        ),
+      )..checkAuth(),
+      child: MaterialApp(
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
+        locale: context.locale,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF008a8b)),
+        ),
+        home: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) {
+            if (state is InitialState) {
+              return Scaffold(
+                backgroundColor: Colors.white,
+                body: Center(
+                  child: Image.asset('assets/images/messenger.png', scale: 3,),
+                ),
+              );
+            }
+            if (state is AuthenticatedState) {
+              return const MainTab();
+            }
+            return const SignInPage();
+          },
+        ),
       ),
-      home: const SignInPage(),
     );
   }
 }
