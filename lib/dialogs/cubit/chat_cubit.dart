@@ -37,13 +37,20 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  Future<void> openDialog(String dialogId) async {
+  Future<void> openDialog({String? dialogId, String? userId}) async {
     try {
-      final dialog = state.dialogs.firstWhere((element) => element.id == dialogId);
-      emit(ChatState(state.dialogs, state.users, dialog));
-      chatRepository.openDialog(dialogId, (dialog) {
+      if (userId != null) {
+        dialogId = await chatRepository.getDialogByUser(userId);
+      }
+      if (dialogId != null) {
+        final dialog = state.dialogs.firstWhere((element) => element.id == dialogId);
         emit(ChatState(state.dialogs, state.users, dialog));
-      });
+        chatRepository.openDialog(dialogId, (dialog) {
+          emit(ChatState(state.dialogs, state.users, dialog));
+        });
+      } else {
+        emit(ChatState(state.dialogs, state.users, null));
+      }
     } catch (e) {
       print(e.toString());
     }

@@ -35,13 +35,29 @@ class DialogsPageState extends State<DialogsPage> {
                 final participantIds = dialog.participants;
                 final participants = allUsers
                     .where((user) => participantIds.contains(user.id))
-                    .toList();
+                    .toList(); // except mine
 
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(participants[1].photoUrl ?? ''),
+                  leading: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: CircleAvatar(
+                      backgroundColor: participants[0].isActive
+                          ? Colors.green
+                          : Colors.grey,
+                      radius: 30,
+                      child: participants[0].photoUrl != null
+                        ? Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: CircleAvatar(
+                              radius: 28,
+                              backgroundImage:
+                                  NetworkImage(participants[0].photoUrl!),
+                            ),
+                          )
+                        : const Icon(Icons.person),
                   ),
-                  title: Text(participants[1].name),
+                  ),
+                  title: Text(participants[0].name),
                   subtitle: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -58,11 +74,11 @@ class DialogsPageState extends State<DialogsPage> {
                         )
                       : null,
                   onTap: () {
-                    context.read<ChatCubit>().openDialog(dialog.id);
+                    context.read<ChatCubit>().openDialog(dialogId: dialog.id);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatPage(user: participants[1],),
+                          builder: (context) => ChatPage(user: participants[0],),
                         ),
                       );
                   },

@@ -32,6 +32,7 @@ class MainTabState extends State<MainTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileCubit>().init(getIt.get<IAuthRepository>().userEmail);
       context.read<ChatCubit>().loadUsers();
+      context.read<ChatCubit>().loadDialogs();
     });
   }
 

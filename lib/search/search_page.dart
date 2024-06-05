@@ -52,6 +52,7 @@ class SearchPageState extends State<SearchPage> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
+                        context.read<ChatCubit>().openDialog(userId: users[index].id);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
