@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:messenger/data/data_sources/interfaces/i_preference_data_source.dart';
+import 'package:messenger/domain/entities/language.dart';
+import 'package:messenger/presentation/di/injector.dart';
 import 'package:messenger_app/auth/cubit/auth_cubit.dart';
 import 'package:messenger_app/lang/locale_keys.g.dart';
+import 'package:messenger_app/profile/cubit/profile_cubit.dart';
+import 'package:messenger_app/utils.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,16 +19,35 @@ class ProfilePage extends StatefulWidget {
 }
 
 class ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _nameController =
-      TextEditingController(text: 'John Doe');
-  final TextEditingController _emailController =
-      TextEditingController(text: 'example@example.com');
-  final TextEditingController _phoneController =
-      TextEditingController(text: '1234567890');
-  final TextEditingController _birthdayController =
-      TextEditingController(text: '01/01/2000');
-  String _selectedLanguage = 'en';
-  DateTime? _selectedDate = DateTime(2000);
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _birthdayController = TextEditingController();
+  String _appLanguage = 'en';
+  //Language _messagesLanguage = Language.English;
+  DateTime? _selectedDate;
+  File? _selectedImage;
+  String? _photoUrl;
+  final DateFormat _dateFormat = DateFormat('dd-MM-yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _appLanguage = getIt.get<IPreferenceDataSource>().appLanguage;
+    //_messagesLanguage = getIt.get<IPreferenceDataSource>().messageLanguage;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        final userData = context.read<ProfileCubit>().state.user;
+        _nameController.text = userData?.name ?? '';
+        _emailController.text = userData?.email ?? '';
+        _phoneController.text = userData?.phone ?? '';
+        _birthdayController.text =
+            _dateFormat.format(userData?.birthday ?? DateTime(2010));
+        _selectedDate = userData?.birthday;
+        _photoUrl = userData?.photoUrl;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +59,29 @@ class ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            CircleAvatar(
-              radius: 70,
-              backgroundImage: NetworkImage('https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg'),
+            GestureDetector(
+              onTap: () {
+                Utils.showImagePicker(context, (file) {
+                  setState(() {
+                    _selectedImage = file;
+                  });
+                });
+              },
+              child: _selectedImage != null
+                  ? CircleAvatar(
+                      radius: 70,
+                      backgroundImage: FileImage(_selectedImage!),
+                    )
+                  : _photoUrl != null
+                      ? CircleAvatar(
+                          radius: 70,
+                          backgroundImage: NetworkImage(_photoUrl!),
+                        )
+                      : const SizedBox(
+                          height: 70,
+                          width: 70,
+                          child: const Icon(Icons.add_a_photo),
+                        ),
             ),
             TextField(
               decoration: InputDecoration(
@@ -72,18 +118,21 @@ class ProfilePageState extends State<ProfilePage> {
                   lastDate: DateTime(2010),
                 );
                 if (_selectedDate != null) {
-                  DateFormat dateFormat = DateFormat('dd-MM-yyyy');
-                  _birthdayController.text = dateFormat.format(_selectedDate!);
+                  _birthdayController.text = _dateFormat.format(_selectedDate!);
                 }
               },
             ),
             const SizedBox(height: 16.0),
             DropdownButton<String>(
-              value: _selectedLanguage,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
+              value: _appLanguage,
+              onChanged: (value) async {
+                if (value != null) {
+                  getIt.get<IPreferenceDataSource>().appLanguage = value;
+                  await context.setLocale(Locale(value));
+                  setState(() {
+                    _appLanguage = value;
+                  });
+                }
               },
               items: [
                 DropdownMenuItem(
@@ -98,8 +147,13 @@ class ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                // Save all data
+              onPressed: () async {
+                await context.read<ProfileCubit>().updateUserProfile(
+                      name: _nameController.text,
+                      phone: _phoneController.text,
+                      birthday: _selectedDate,
+                      photo: _selectedImage,
+                    );
               },
               child: Text(LocaleKeys.saveAll.tr()),
             ),

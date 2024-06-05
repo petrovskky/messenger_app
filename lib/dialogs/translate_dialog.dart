@@ -25,6 +25,13 @@ class TranslateDialogState extends State<TranslateDialog> {
   void initState() {
     _selectedLanguage = getIt.get<IPreferenceDataSource>().messageLanguage;
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _translatedText = await Translator.translate(
+        widget.originText,
+        _selectedLanguage,
+      );
+      setState(() {});
+    });
   }
 
   @override

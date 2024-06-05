@@ -21,6 +21,7 @@ abstract class  LocaleKeys {
   static const english = 'english';
   static const russian = 'russian';
   static const saveAll = 'saveAll';
+  static const message = 'message';
   static const Arabic = 'Arabic';
   static const Armenian = 'Armenian';
   static const Azerbaijani = 'Azerbaijani';

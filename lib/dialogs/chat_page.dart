@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger/domain/entities/user.dart';
 import 'package:messenger_app/dialogs/translate_dialog.dart';
+import 'package:messenger_app/lang/locale_keys.g.dart';
+import 'package:messenger_app/profile/cubit/profile_cubit.dart';
 import 'package:messenger_app/profile/user_page.dart';
 
 class ChatPage extends StatefulWidget {
@@ -14,68 +17,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class ChatPageState extends State<ChatPage> {
-  final messages = [
-    Message(
-      dateTime: DateTime.now().subtract(Duration(hours: 2)),
-      text: 'What are your plans for the weekend?',
-      userImage:
-          'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
-    ),
-    Message(
-      dateTime: DateTime.now().subtract(Duration(hours: 1)),
-      text: 'I am thinking of going hiking.',
-      userImage:
-          'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
-    ),
-    Message(
-      dateTime: DateTime.now(),
-      text: 'Sounds great! Maybe I will join you.',
-      userImage:
-          'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 10)),
-      text: 'That would be awesome!',
-      userImage:
-          'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 20)),
-      text: 'Do you have any other plans?',
-      userImage:
-          'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 30)),
-      text: 'I plan to visit my family',
-      userImage:
-          'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 40)),
-      text: 'Sounds cool 👍',
-      userImage:
-          'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 50)),
-      text: 'Thank you! Have a great weekend!',
-      userImage:
-          'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 55)),
-      text: 'And you 😀',
-      userImage:
-          'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg',
-    ),
-    Message(
-      dateTime: DateTime.now().add(Duration(minutes: 60)),
-      text: 'See you on Monday 👋',
-      userImage:
-          'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg',
-    ),
-  ];
+  final messages = [];
 
   TextEditingController _textEditingController = TextEditingController();
 
@@ -86,8 +28,7 @@ class ChatPageState extends State<ChatPage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://henderson.ru/uimages/catalog/product/HT-0254/HT-0254-DNAVY-6-1.jpg'),
+              backgroundImage: NetworkImage(widget.user.photoUrl ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg'),
             ),
             SizedBox(width: 8),
             GestureDetector(
@@ -100,7 +41,7 @@ class ChatPageState extends State<ChatPage> {
                 );
               },
               child: Text(
-                'Mark Johnson',
+                widget.user.name,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -175,7 +116,7 @@ class ChatPageState extends State<ChatPage> {
                   child: TextField(
                     controller: _textEditingController,
                     decoration: InputDecoration(
-                      hintText: 'Введите сообщение...',
+                      hintText: LocaleKeys.message.tr(),
                     ),
                   ),
                 ),

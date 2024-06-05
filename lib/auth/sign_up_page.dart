@@ -27,15 +27,6 @@ class SignUpPageState extends State<SignUpPage> {
   DateTime? _selectedDate;
   bool _isLoading = false;
 
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedImage = await ImagePicker().pickImage(source: source);
-    if (pickedImage != null) {
-      setState(() {
-        _selectedImage = File(pickedImage.path);
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -50,35 +41,11 @@ class SignUpPageState extends State<SignUpPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(LocaleKeys.selectImage.tr()),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: <Widget>[
-                                GestureDetector(
-                                  child: Text(LocaleKeys.gallery.tr()),
-                                  onTap: () {
-                                    _pickImage(ImageSource.gallery);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                const SizedBox(height: 16.0),
-                                GestureDetector(
-                                  child: Text(LocaleKeys.camera.tr()),
-                                  onTap: () {
-                                    _pickImage(ImageSource.camera);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                    Utils.showImagePicker(context, (file) {
+                      setState(() {
+                        _selectedImage = file;
+                      });
+                    });
                   },
                   child: Center(
                     child: Container(
@@ -90,9 +57,9 @@ class SignUpPageState extends State<SignUpPage> {
                       ),
                       child: _selectedImage != null
                           ? CircleAvatar(
-                        radius: 200,
-                        backgroundImage: NetworkImage('https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg'),
-                      )
+                              radius: 200,
+                              backgroundImage: FileImage(_selectedImage!),
+                            )
                           : const Icon(Icons.add_a_photo),
                     ),
                   ),

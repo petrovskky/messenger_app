@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:messenger/data/repositories/auth_repository.dart';
 import 'package:messenger/domain/data_interfaces/i_auth_repository.dart';
+import 'package:messenger/domain/data_interfaces/i_chat_repository.dart';
+import 'package:messenger/domain/data_interfaces/i_user_repository.dart';
 import 'package:messenger/presentation/di/injector.dart' as injector;
 import 'package:messenger_app/auth/cubit/auth_cubit.dart';
 import 'package:messenger_app/auth/cubit/auth_state.dart';
 import 'package:messenger_app/auth/sign_in_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:messenger_app/dialogs/cubit/chat_cubit.dart';
 import 'package:messenger_app/main_tab.dart';
+import 'package:messenger_app/profile/cubit/profile_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
@@ -25,7 +29,8 @@ Future<void> main() async {
   injector.setup(
     FirebaseAuth.instance,
     FirebaseFirestore.instance,
-    (await SharedPreferences.getInstance()),
+    FirebaseStorage.instance,
+    (await SharedPreferences.getInstance())
   );
   runApp(EasyLocalization(
     path: 'assets/lang',
@@ -70,7 +75,21 @@ class MyApp extends StatelessWidget {
               );
             }
             if (state is AuthenticatedState) {
-              return const MainTab();
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider<ProfileCubit>(
+                    create: (context) => ProfileCubit(
+                      userRepository: injector.getIt.get<IUserRepository>()
+                    ),
+                  ),
+                  BlocProvider<ChatCubit>(
+                    create: (context) => ChatCubit(
+                      chatRepository: injector.getIt.get<IChatRepository>()
+                    ),
+                  ),
+                ],
+                child: const MainTab(),
+              );
             }
             return const SignInPage();
           },
