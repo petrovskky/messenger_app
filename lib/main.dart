@@ -49,10 +49,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthCubit>(
-      create: (context) => AuthCubit(
-        authRepository: injector.getIt.get<IAuthRepository>(),
-      )..checkAuth(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(
+          create: (context) => AuthCubit(
+            authRepository: injector.getIt.get<IAuthRepository>(),
+          )..checkAuth(),
+        ),
+        BlocProvider<ProfileCubit>(
+          create: (context) => ProfileCubit(
+            userRepository: injector.getIt.get<IUserRepository>()
+          ),
+        ),
+        BlocProvider<ChatCubit>(
+          create: (context) => ChatCubit(
+            chatRepository: injector.getIt.get<IChatRepository>()
+          ),
+        ),
+      ],
       child: MaterialApp(
         supportedLocales: context.supportedLocales,
         localizationsDelegates: context.localizationDelegates,
@@ -75,21 +89,7 @@ class MyApp extends StatelessWidget {
               );
             }
             if (state is AuthenticatedState) {
-              return MultiBlocProvider(
-                providers: [
-                  BlocProvider<ProfileCubit>(
-                    create: (context) => ProfileCubit(
-                      userRepository: injector.getIt.get<IUserRepository>()
-                    ),
-                  ),
-                  BlocProvider<ChatCubit>(
-                    create: (context) => ChatCubit(
-                      chatRepository: injector.getIt.get<IChatRepository>()
-                    ),
-                  ),
-                ],
-                child: const MainTab(),
-              );
+              return const MainTab();
             }
             return const SignInPage();
           },
