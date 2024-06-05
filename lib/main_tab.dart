@@ -46,6 +46,8 @@ class MainTabState extends State<MainTab> {
           setState(() {
             _currentIndex = index;
           });
+          context.read<ChatCubit>().loadUsers();
+          context.read<ChatCubit>().loadDialogs();
         },
         items: [
           BottomNavigationBarItem(

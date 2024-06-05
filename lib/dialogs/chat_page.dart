@@ -19,7 +19,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class ChatPageState extends State<ChatPage> {
-  final messages = [];
+  final _messages = [];
 
   TextEditingController _textEditingController = TextEditingController();
 
@@ -55,7 +55,7 @@ class ChatPageState extends State<ChatPage> {
       ),
       body: BlocBuilder<ChatCubit, ChatState>(
         builder: (context, state) {
-          final messages = state.currentDialog?.messages ?? [];
+          final messages = state.currentDialog?.messages ?? _messages;
             return Column(
               children: [
                 Expanded(
@@ -63,7 +63,7 @@ class ChatPageState extends State<ChatPage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isUserMessage = message.isMine;
+                      final isUserMessage = message.senderId != widget.user.id;
                       return GestureDetector(
                         onLongPress: () {
                           showDialog(
@@ -131,8 +131,8 @@ class ChatPageState extends State<ChatPage> {
                           String messageText = _textEditingController.text;
                           await context.read<ChatCubit>().sendMessage(widget.user.id, messageText, dialogId: state.currentDialog?.id);
                           setState(() {
-                            messages.add(Message(
-                              isMine: true,
+                            _messages.add(Message(
+                              senderId: 'myId',
                               dateTime: DateTime.now(),
                               text: messageText,
                             ));

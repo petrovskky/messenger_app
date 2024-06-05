@@ -134,14 +134,15 @@ class SignUpPageState extends State<SignUpPage> {
                           name: name,
                           phone: phone,
                           birthday: birthday,
-                          photoUrl: _selectedImage?.path,
+                          photo: _selectedImage,
                         );
                     setState(() {
                       _isLoading = false;
                     });
                     if (!res) {
                       Utils.showErrorMessage(context, LocaleKeys.error.tr());
-                      return;
+                    } else {
+                      //Navigator.of(context).pop();
                     }
                   },
                   child: Text(LocaleKeys.signUp.tr()),
@@ -149,8 +150,7 @@ class SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 8.0),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const SignInPage()));
+                    Navigator.of(context).pop();
                   },
                   child: Text(LocaleKeys.signIn.tr()),
                 ),

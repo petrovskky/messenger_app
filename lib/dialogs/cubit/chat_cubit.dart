@@ -5,7 +5,8 @@ import 'package:messenger_app/dialogs/cubit/chat_state.dart';
 class ChatCubit extends Cubit<ChatState> {
   final IChatRepository chatRepository;
 
-  ChatCubit({required this.chatRepository}) : super(const ChatState([], [], null));
+  ChatCubit({required this.chatRepository})
+      : super(const ChatState([], [], null));
 
   Future<void> loadDialogs() async {
     try {
@@ -25,12 +26,16 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  Future<void> sendMessage(String userId, String text, {String? dialogId}) async {
+  Future<void> sendMessage(String userId, String text,
+      {String? dialogId}) async {
     try {
       dialogId ??= await chatRepository.createDialog(userId);
       if (dialogId != null) {
         await chatRepository.sendMessage(dialogId, text);
-        emit(ChatState(state.dialogs, state.users, state.currentDialog));
+        if (state.currentDialog != null &&
+            state.currentDialog!.id == dialogId) {
+          await openDialog(dialogId: dialogId);
+        }
       }
     } catch (e) {
       print(e.toString());
@@ -43,7 +48,8 @@ class ChatCubit extends Cubit<ChatState> {
         dialogId = await chatRepository.getDialogByUser(userId);
       }
       if (dialogId != null) {
-        final dialog = state.dialogs.firstWhere((element) => element.id == dialogId);
+        final dialog =
+            state.dialogs.firstWhere((element) => element.id == dialogId);
         emit(ChatState(state.dialogs, state.users, dialog));
         chatRepository.openDialog(dialogId, (dialog) {
           emit(ChatState(state.dialogs, state.users, dialog));

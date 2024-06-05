@@ -62,7 +62,7 @@ class UserProfilePageState extends State<UserProfilePage> {
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle button press
+                  Navigator.of(context).pop();
                 },
                 child: Text('Написать'),
               ),

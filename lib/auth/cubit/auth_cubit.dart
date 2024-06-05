@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger/domain/data_interfaces/i_auth_repository.dart';
 import 'package:messenger_app/auth/cubit/auth_state.dart';
@@ -40,7 +42,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String password,
     required String phone,
     required DateTime? birthday,
-    required String? photoUrl,
+    required File? photo,
   }) async {
     try {
       final id = await _authRepository.signUp(
@@ -49,7 +51,7 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
         phone: phone,
         birthday: birthday,
-        photoUrl: photoUrl,
+        photo: photo,
       );
       if (id.isNotEmpty) {
         emit(AuthenticatedState());
