@@ -85,7 +85,7 @@ class SignInPageState extends State<SignInPage> {
                 const SizedBox(height: 8.0),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const SignUpPage()));
                   },
                   child: Text(LocaleKeys.signUp.tr()),

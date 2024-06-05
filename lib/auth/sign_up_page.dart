@@ -142,7 +142,7 @@ class SignUpPageState extends State<SignUpPage> {
                     if (!res) {
                       Utils.showErrorMessage(context, LocaleKeys.error.tr());
                     } else {
-                      //Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     }
                   },
                   child: Text(LocaleKeys.signUp.tr()),
